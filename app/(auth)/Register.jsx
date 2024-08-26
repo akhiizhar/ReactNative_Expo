@@ -7,12 +7,64 @@ import {
 	TouchableOpacity,
 } from "react-native";
 import React from "react";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import ModalPopup from "../../components/Modal";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-export default function Login() {
-	const [text, onChangeText] = React.useState(null);
-	const [email, onChangeEmail] = React.useState(null);
-	const [number, onChangeNumber] = React.useState(null);
+export default function Register() {
+	// const [text, onChangeText] = React.useState(null);
+	// const [email, onChangeEmail] = React.useState(null);
+	// const [number, onChangeNumber] = React.useState(null);
+	const [errorMessage, setErrorMessage] = useState(null);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [formData, setFormData] = useState({
+		email: "",
+		password: "",
+	});
+	const handleChange = (name, text) => {
+		setFormData({
+			...formData,
+			[name]: text,
+		});
+	};
+	const handleSubmit = async () => {
+		try {
+			const req = await fetch(
+				"https://api-car-rental.binaracademy.org/customer/auth/register",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						email: formData.email,
+						password: formData.password,
+					}),
+				}
+			);
+			const body = await req.json();
+			console.log(body);
+
+			if (!req.ok)
+				throw new Error(
+					body.message || body.errors[0].message || "Something Went Wrong!"
+				);
+
+			setModalVisible(true);
+			setTimeout(() => {
+				setModalVisible(false);
+				router.navigate("/");
+			}, 2500);
+		} catch (e) {
+			setErrorMessage(e.message);
+			setModalVisible(true);
+			setTimeout(() => {
+				setModalVisible(false);
+				setErrorMessage(null);
+			}, 2500);
+		}
+	};
 	return (
 		<View>
 			<View>
@@ -28,8 +80,8 @@ export default function Login() {
 				<Text style={styles.text}>Name*</Text>
 				<TextInput
 					style={styles.input}
-					onChangeText={onChangeText}
-					value={text}
+					// onChangeText={onChangeText}
+					// value={text}
 					placeholder="Full Name"
 				/>
 			</View>
@@ -37,8 +89,8 @@ export default function Login() {
 				<Text style={styles.text}>Email*</Text>
 				<TextInput
 					style={styles.input}
-					onChangeText={onChangeEmail}
-					value={email}
+					onChangeText={(text) => handleChange("email", text)}
+					// value={email}
 					placeholder="Contoh: johndee@gmail.com"
 				/>
 			</View>
@@ -46,16 +98,16 @@ export default function Login() {
 				<Text style={styles.text}>Password</Text>
 				<TextInput
 					style={styles.input}
-					onChangeText={onChangeNumber}
-					value={number}
 					secureTextEntry={true}
+					onChangeText={(text) => handleChange("password", text)}
+					// value={number}
 					placeholder="6+ Karakter"
 					keyboardType="numeric"
 				/>
 			</View>
 
 			<View style={styles.formContainer}>
-				<TouchableOpacity style={styles.button}>
+				<TouchableOpacity onPress={() => handleSubmit()} style={styles.button}>
 					<Text
 						style={{
 							color: "white",
@@ -76,6 +128,33 @@ export default function Login() {
 					</Link>
 				</Text>
 			</View>
+			<ModalPopup visible={modalVisible}>
+				<View style={styles.modalBackground}>
+					{errorMessage !== null ? (
+						<>
+							<Ionicons
+								size={100}
+								name={"close-circle-outline"}
+								style={{ color: "red" }}
+							/>
+							<Text style={{ fontFamily: "PoppinsRegular", fontSize: 16 }}>
+								{errorMessage}
+							</Text>
+						</>
+					) : (
+						<>
+							<Ionicons
+								size={100}
+								name={"checkmark-done-outline"}
+								style={{ color: "#669BFA" }}
+							/>
+							<Text style={{ fontFamily: "PoppinsRegular", fontSize: 16 }}>
+								Berhasil Register
+							</Text>
+						</>
+					)}
+				</View>
+			</ModalPopup>
 		</View>
 	);
 }
@@ -125,5 +204,14 @@ const styles = StyleSheet.create({
 		backgroundColor: "#3D7B3F",
 		borderRadius: 5,
 		marginBottom: 20,
+	},
+	modalBackground: {
+		width: "90%",
+		backgroundColor: "#fff",
+		elevation: 20,
+		borderRadius: 4,
+		padding: 20,
+		alignItems: "center",
+		justifyContent: "center",
 	},
 });

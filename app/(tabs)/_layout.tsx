@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, useSegments } from "expo-router";
 import React from "react";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
@@ -7,6 +7,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme();
+	const segments = useSegments();
 
 	return (
 		<Tabs
@@ -27,9 +28,13 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="listcar"
+				name="(listcar)"
 				options={{
+					href: "/(listcar)",
 					title: "Daftar Mobil",
+					tabBarStyle: {
+						display: segments.includes("details") ? "none" : "flex",
+					},
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon
 							name={focused ? "list" : "list-outline"}

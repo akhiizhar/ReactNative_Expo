@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { Text, StyleSheet, Image, Pressable, style } from "react-native";
 import React from "react";
 import { Col, Row } from "@/components/Grid";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -7,9 +7,16 @@ const formatCurrency = new Intl.NumberFormat("id-ID", {
 	style: "currency",
 	currency: "IDR",
 });
-export default function CarList({ image, carName, passenger, baggage, price }) {
+export default function CarList({
+	onPress,
+	image,
+	carName,
+	passenger,
+	baggage,
+	price,
+}) {
 	return (
-		<View style={styles.card}>
+		<Pressable style={{ ...styles.card, ...style }} onPress={onPress}>
 			<Row alignItems={"center"} gap={15}>
 				<Col>
 					<Image style={styles.img} source={image} />
@@ -29,7 +36,7 @@ export default function CarList({ image, carName, passenger, baggage, price }) {
 					<Text style={styles.price}>{formatCurrency.format(price)}</Text>
 				</Col>
 			</Row>
-		</View>
+		</Pressable>
 	);
 }
 
@@ -40,6 +47,8 @@ const styles = StyleSheet.create({
 		borderRadius: 4,
 		padding: 5,
 		marginBottom: 20,
+		marginVertical: 20,
+		marginHorizontal: 20,
 	},
 	img: {
 		width: 80,
