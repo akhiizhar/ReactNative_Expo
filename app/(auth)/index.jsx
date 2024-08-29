@@ -75,7 +75,6 @@ export default function Login() {
 				setErrorMessage(null);
 			}, 2500);
 		}
-		console.log(e);
 	};
 
 	return (

@@ -1,11 +1,32 @@
 import { View, Image, Text, Button, StyleSheet } from "react-native";
 import React from "react";
+import * as SecureStore from "expo-secure-store";
+import { useState, useEffect } from "react";
 
 export default function Profile() {
+	const [user, setUser] = useState("");
+
+	useEffect(() => {
+		const getEmail = async () => {
+			try {
+				const userData = await SecureStore.getItemAsync("user");
+				if (userData) {
+					const parsedEmail = JSON.parse(userData);
+					console.log("User data:", parsedEmail);
+					setUser(parsedEmail);
+				}
+			} catch (error) {
+				console.error("Failed to fetch email from SecureStore:", error);
+			}
+		};
+
+		getEmail();
+	}, []);
 	return (
 		<View style={styles.container}>
 			<Text style={styles.akun}>Akun</Text>
 			<View style={styles.content}>
+				<Text>{user.email}</Text>
 				<Image
 					source={require("@/assets/images/allura.png")}
 					style={styles.image}

@@ -6,34 +6,39 @@ import ButtonIcon from "../../components/ButtonIcon";
 import CarList from "../../components/CarList";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
+import { useSelector, useDispatch } from "react-redux";
+import { getCar, selectCar } from "@/redux/reducers/car/carSlice";
+import * as SecureStore from "expo-secure-store";
 
 export default function HomeScreen() {
-	const [cars, setCars] = useState([]);
-	const [loading, setLoading] = useState(false);
+	const [user, setUser] = useState("");
+
+	useEffect(() => {
+		const getEmail = async () => {
+			try {
+				const userData = await SecureStore.getItemAsync("user");
+				if (userData) {
+					const parsedEmail = JSON.parse(userData);
+					console.log("User data:", parsedEmail);
+					setUser(parsedEmail);
+				}
+			} catch (error) {
+				console.error("Failed to fetch email from SecureStore:", error);
+			}
+		};
+
+		getEmail();
+	}, []);
+
+	const { data, isLoading } = useSelector(selectCar);
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
 		const signal = controller.signal; // UseEffect cleanup
 
-		setLoading(true); //loading state
-		const getData = async () => {
-			try {
-				const response = await fetch(
-					"https://api-car-rental.binaracademy.org/customer/car",
-					{ signal: signal } // UseEffect cleanup
-				);
-				const body = await response.json();
-				setCars(body);
-			} catch (e) {
-				// Error Handling
-				if (err.name === "AbortError") {
-					console.log("successfully aborted");
-				} else {
-					console.log(err);
-				}
-			}
-		};
-		getData();
+		dispatch(getCar(signal));
+
 		return () => {
 			// cancel request sebelum component di close
 			controller.abort();
@@ -46,7 +51,7 @@ export default function HomeScreen() {
 			headerImage={
 				<View style={styles.container}>
 					<View>
-						<Text style={styles.titleText}>Hi, Nama</Text>
+						<Text style={styles.titleText}>Hi, {user.email}</Text>
 						<Text style={styles.titleText}>Location</Text>
 					</View>
 					<View>
@@ -107,8 +112,8 @@ export default function HomeScreen() {
 					<Text style={styles.textDaftar}>Daftar Mobil Pilihan</Text>
 				</>
 			}
-			loading={loading}
-			data={cars}
+			loading={isLoading}
+			data={data}
 			keyExtractor={(item) => item.id.toString()}
 			renderItem={({ item }) => (
 				<CarList
@@ -131,7 +136,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
 	container: {
-		paddingTop: Constants.statusBarHeight + 10,
+		marginTop: Constants.statusBarHeight,
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",

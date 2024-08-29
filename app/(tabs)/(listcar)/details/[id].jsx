@@ -14,59 +14,44 @@ import Constants from "expo-constants";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Col, Row } from "@/components/Grid";
 
+import { useSelector, useDispatch } from "react-redux";
+import {
+	getCarDetail,
+	selectCarDetail,
+} from "@/redux/reducers/car/carDetailsSlice";
+
 const formatCurrency = new Intl.NumberFormat("id-ID", {
 	style: "currency",
 	currency: "IDR",
 });
 
 const include = [
-	{
-		key: "Apa saja yang termasuk dalam paket misal durasi max 12 jam",
-	},
-	{ key: "Sudah termasuk bensin selama 12 jam" },
-	{ key: "Sudah termasuk Tiket Wisata" },
-	{ key: "Sudah termasuk pajak" },
+	{ id: 1, key: "Apa saja yang termasuk dalam paket misal durasi max 12 jam" },
+	{ id: 2, key: "Sudah termasuk bensin selama 12 jam" },
+	{ id: 3, key: "Sudah termasuk Tiket Wisata" },
+	{ id: 4, key: "Sudah termasuk pajak" },
 ];
 
 const exclude = [
+	{ id: 1, key: "Tidak termasuk biaya makan sopir Rp 75.000/hari" },
 	{
-		key: "Tidak termasuk biaya makan sopir Rp 75.000/hari",
-	},
-	{
+		id: 2,
 		key: "Jika overtime lebih dari 12 jam akan ada tambahan biaya Rp 20.000/jam",
 	},
-	{ key: "Tidak termasuk akomodasi penginapan" },
+	{ id: 3, key: "Tidak termasuk akomodasi penginapan" },
 ];
 export default function detailScreen() {
 	const { id } = useLocalSearchParams();
-	const [cars, setCars] = useState({});
-	const [loading, setLoading] = useState(false);
+	const { data, isLoading } = useSelector(selectCarDetail);
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
 		const signal = controller.signal; // UseEffect cleanup
 
-		setLoading(true); //loading state
-		const getData = async () => {
-			try {
-				const response = await fetch(
-					"https://api-car-rental.binaracademy.org/customer/car/" + id,
-					{ signal: signal } // UseEffect cleanup
-				);
-				const body = await response.json();
-				setCars(body);
-			} catch (e) {
-				// Error Handling
-				if (err.name === "AbortError") {
-					console.log("successfully aborted");
-				} else {
-					console.log(err);
-				}
-			}
-		};
-		getData();
+		dispatch(getCarDetail({ id, signal }));
+
 		return () => {
-			// cancel request sebelum component di close
 			controller.abort();
 		};
 	}, [id]);
@@ -75,7 +60,7 @@ export default function detailScreen() {
 		<View style={styles.container}>
 			<ScrollView>
 				<View style={styles.icon}>
-					<Text style={{ fontFamily: "PoppinsRegular" }}>{cars.name}</Text>
+					<Text style={{ fontFamily: "PoppinsRegular" }}>{data.name}</Text>
 					<Row style={styles.icon}>
 						<Col style={styles.textIcon}>
 							<Ionicons size={24} name={"people-outline"} color={"#8A8A8A"} />
@@ -86,18 +71,22 @@ export default function detailScreen() {
 							<Text style={styles.capacityText}>{4}</Text>
 						</Col>
 					</Row>
-					<Image source={{ uri: cars.image }} style={styles.img} />
+					<Image
+						loading={isLoading}
+						source={{ uri: data.image }}
+						style={styles.img}
+					/>
 				</View>
 				<View style={styles.containerText}>
 					<Text style={styles.text}>Tentang Paket</Text>
 					<View>
 						<Text style={styles.text}>Include</Text>
 						<View>
-							{include.map((includes) => {
+							{include.map((include) => {
 								return (
 									<Text
-										key={includes.index}
-										style={styles.textIsi}>{`\u2022 ${includes.key}}`}</Text>
+										key={include.id}
+										style={styles.textIsi}>{`\u2022 ${include.key}}`}</Text>
 								);
 							})}
 						</View>
@@ -105,11 +94,11 @@ export default function detailScreen() {
 					<View>
 						<Text style={styles.text}>Exclude</Text>
 						<View>
-							{exclude.map((excludes) => {
+							{exclude.map((exclude) => {
 								return (
 									<Text
-										key={excludes.index}
-										style={styles.textIsi}>{`\u2022 ${excludes.key}}`}</Text>
+										key={exclude.id}
+										style={styles.textIsi}>{`\u2022 ${exclude.key}}`}</Text>
 								);
 							})}
 						</View>
@@ -117,7 +106,7 @@ export default function detailScreen() {
 				</View>
 			</ScrollView>
 			<View style={styles.footer}>
-				<Text style={styles.price}>{formatCurrency.format(cars.price)}</Text>
+				<Text style={styles.price}>{formatCurrency.format(data.price)}</Text>
 				<Button color="#3D7B3F" title="Lanjutkan Pembayaran" />
 			</View>
 		</View>
