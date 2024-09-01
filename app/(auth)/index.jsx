@@ -6,76 +6,79 @@ import {
 	TextInput,
 	TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, router } from "expo-router";
-import { useState } from "react";
 import ModalPopup from "../../components/Modal";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as SecureStore from "expo-secure-store";
+import { useSelector, useDispatch } from "react-redux";
+import {
+	closeModal,
+	postLogin,
+	selectUser,
+} from "../../redux/reducers/auth/authLogin";
 
 async function save(key, value) {
 	await SecureStore.setItemAsync(key, value);
 }
 
 export default function Login() {
-	// const [email, onChangeEmail] = React.useState(null);
-	// const [number, onChangeNumber] = React.useState(null);
-	const [errorMessage, setErrorMessage] = useState(null);
-	const [modalVisible, setModalVisible] = useState(false);
+	const { errorMessage, isModalVisible, isError, data } =
+		useSelector(selectUser);
+	const dispatch = useDispatch();
+
+	const [localErrorMessage, setLocalErrorMessage] = useState(null);
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
 	});
+
 	const handleChange = (name, text) => {
 		setFormData({
 			...formData,
 			[name]: text,
 		});
 	};
+
 	const handleSubmit = async () => {
-		try {
-			if (!formData.email || !formData.password) {
-				setErrorMessage("Email dan Password harus diisi");
-				setModalVisible(true);
-				setTimeout(() => {
-					setModalVisible(false);
-					setErrorMessage(null);
-				}, 2500);
-				return; // Menghentikan proses jika email atau password kosong
-			}
-			const req = await fetch(
-				"https://api-car-rental.binaracademy.org/customer/auth/login",
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						email: formData.email,
-						password: formData.password,
-					}),
-				}
-			);
-			const body = await req.json();
-			console.log(body);
+		dispatch(postLogin(formData));
 
-			if (!req.ok) throw new Error(body.message);
+		// try {
+		// 	if (!formData.email || !formData.password) {
+		// 		setLocalErrorMessage("Email dan Password harus diisi");
+		// 		setModalVisible(true);
+		// 		setTimeout(() => {
+		// 			setModalVisible(false);
+		// 			setLocalErrorMessage(null);
+		// 		}, 2500);
+		// 		return;
+		// 	}
 
-			save("user", JSON.stringify(body));
-			setModalVisible(true);
+		// 	if (!req.ok) throw new Error(body.message);
+
+		// 	save("user", JSON.stringify(body));
+		// 	setModalVisible(true);
+		// 	setTimeout(() => {
+		// 		setModalVisible(false);
+		// 		router.navigate("../(tabs)");
+		// 	}, 2500);
+		// } catch (e) {
+		// 	setLocalErrorMessage(e.message);
+		// 	setModalVisible(true);
+		// 	setTimeout(() => {
+		// 		setModalVisible(false);
+		// 		setLocalErrorMessage(null);
+		// 	}, 2500);
+		// }
+	};
+	useEffect(() => {
+		if (isModalVisible) {
 			setTimeout(() => {
-				setModalVisible(false);
-				router.navigate("../(tabs)");
-			}, 2500);
-		} catch (e) {
-			setErrorMessage(e.message);
-			setModalVisible(true);
-			setTimeout(() => {
-				setModalVisible(false);
-				setErrorMessage(null);
+				dispatch(closeModal());
+				if (!isError) router.push("/(tabs)");
 			}, 2500);
 		}
-	};
+	}, [isModalVisible]);
 
 	return (
 		<View>
@@ -93,7 +96,6 @@ export default function Login() {
 				<TextInput
 					style={styles.input}
 					onChangeText={(text) => handleChange("email", text)}
-					// value={email}
 					placeholder="Contoh: johndee@gmail.com"
 				/>
 			</View>
@@ -102,7 +104,6 @@ export default function Login() {
 				<TextInput
 					style={styles.input}
 					onChangeText={(text) => handleChange("password", text)}
-					// value={number}
 					secureTextEntry={true}
 					placeholder="6+ Karakter"
 					keyboardType="numeric"
@@ -110,16 +111,8 @@ export default function Login() {
 			</View>
 
 			<View style={styles.formContainer}>
-				<TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
-					<Text
-						style={{
-							color: "white",
-							textAlign: "center",
-							fontFamily: "PoppinsBold",
-							fontSize: 16,
-						}}>
-						Sign In
-					</Text>
+				<TouchableOpacity style={styles.button} onPress={handleSubmit}>
+					<Text style={styles.buttonText}>Sign In</Text>
 				</TouchableOpacity>
 			</View>
 
@@ -131,17 +124,18 @@ export default function Login() {
 					</Link>
 				</Text>
 			</View>
-			<ModalPopup visible={modalVisible}>
+
+			<ModalPopup visible={isModalVisible}>
 				<View style={styles.modalBackground}>
-					{errorMessage !== null ? (
+					{localErrorMessage || errorMessage !== null ? (
 						<>
 							<Ionicons
 								size={100}
 								name={"close-circle-outline"}
 								style={{ color: "red" }}
 							/>
-							<Text style={{ fontFamily: "PoppinsRegular", fontSize: 16 }}>
-								{errorMessage}
+							<Text style={styles.modalText}>
+								{localErrorMessage || errorMessage}
 							</Text>
 						</>
 					) : (
@@ -151,9 +145,7 @@ export default function Login() {
 								name={"checkmark-done-outline"}
 								style={{ color: "#669BFA" }}
 							/>
-							<Text style={{ fontFamily: "PoppinsRegular", fontSize: 16 }}>
-								Berhasil Login
-							</Text>
+							<Text style={styles.modalText}>Berhasil Login</Text>
 						</>
 					)}
 				</View>
@@ -164,9 +156,6 @@ export default function Login() {
 
 const styles = StyleSheet.create({
 	input: {
-		// height: 40,
-		// margin: 10,
-		// marginTop: 0,
 		borderWidth: 1,
 		padding: 10,
 		paddingHorizontal: 10,
@@ -174,7 +163,6 @@ const styles = StyleSheet.create({
 		fontFamily: "PoppinsRegular",
 	},
 	text: {
-		// marginBottom: 10,
 		color: "black",
 		fontFamily: "PoppinsBold",
 		fontSize: 14,
@@ -208,6 +196,12 @@ const styles = StyleSheet.create({
 		borderRadius: 5,
 		marginBottom: 20,
 	},
+	buttonText: {
+		color: "white",
+		textAlign: "center",
+		fontFamily: "PoppinsBold",
+		fontSize: 16,
+	},
 	modalBackground: {
 		width: "90%",
 		backgroundColor: "#fff",
@@ -216,5 +210,9 @@ const styles = StyleSheet.create({
 		padding: 20,
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	modalText: {
+		fontFamily: "PoppinsRegular",
+		fontSize: 16,
 	},
 });

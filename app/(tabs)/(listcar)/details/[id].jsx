@@ -4,21 +4,20 @@ import {
 	ScrollView,
 	Image,
 	StyleSheet,
-	FlatList,
 	Button,
 } from "react-native";
 import React from "react";
 import { useLocalSearchParams } from "expo-router";
-import { useState, useEffect } from "react";
-import Constants from "expo-constants";
+import { useEffect } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Col, Row } from "@/components/Grid";
-
+import { router } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
 import {
 	getCarDetail,
 	selectCarDetail,
 } from "@/redux/reducers/car/carDetailsSlice";
+import ButtonBack from "../../../../components/ButtonBack";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
 	style: "currency",
@@ -58,6 +57,7 @@ export default function detailScreen() {
 
 	return (
 		<View style={styles.container}>
+			<ButtonBack />
 			<ScrollView>
 				<View style={styles.icon}>
 					<Text style={{ fontFamily: "PoppinsRegular" }}>{data.name}</Text>
@@ -107,7 +107,11 @@ export default function detailScreen() {
 			</ScrollView>
 			<View style={styles.footer}>
 				<Text style={styles.price}>{formatCurrency.format(data.price)}</Text>
-				<Button color="#3D7B3F" title="Lanjutkan Pembayaran" />
+				<Button
+					color="#3D7B3F"
+					title="Lanjutkan Pembayaran"
+					onPress={() => router.navigate("(order)")}
+				/>
 			</View>
 		</View>
 	);
@@ -116,8 +120,6 @@ export default function detailScreen() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		alignItems: "center",
-		justifyContent: "center",
 		marginTop: 50,
 	},
 	capacityText: {

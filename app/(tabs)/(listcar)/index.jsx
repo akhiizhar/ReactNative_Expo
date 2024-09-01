@@ -5,13 +5,11 @@ import {
 	Text,
 	ActivityIndicator,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import CarList from "../../../components/CarList";
-import Constants from "expo-constants";
 import { router } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
 import { getCar, selectCar } from "@/redux/reducers/car/carSlice";
-import { isLoading } from "expo-font";
 
 export default function listcar() {
 	const { data, isLoading } = useSelector(selectCar);
@@ -56,7 +54,7 @@ export default function listcar() {
 						key={item.id}
 						image={{ uri: item.image }}
 						carName={item.name}
-						passengers={5}
+						passenger={5}
 						baggage={4}
 						price={item.price}
 						onPress={() => router.navigate("(listcar)/details/" + item.id)}

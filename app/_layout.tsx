@@ -17,8 +17,8 @@ import { store } from "../redux/store";
 SplashScreen.preventAutoHideAsync();
 
 function getUser() {
+	// SecureStore.deleteItemAsync("user");
 	return SecureStore.getItem("user");
-	// SecureStore.deleteItem("user");
 }
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
@@ -30,10 +30,10 @@ export default function RootLayout() {
 
 	useEffect(() => {
 		if (loaded) {
-			SplashScreen.hideAsync();
-			if (getUser()) {
-				router.navigate("../(tabs)");
-			}
+			setTimeout(() => {
+				if (getUser()) router.replace("../(tabs)");
+				console.log(getUser());
+			}, 100);
 			setTimeout(() => {
 				SplashScreen.hideAsync();
 			}, 500);
@@ -50,6 +50,7 @@ export default function RootLayout() {
 				<Stack>
 					<Stack.Screen name="(auth)" options={{ headerShown: false }} />
 					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+					<Stack.Screen name="(order)" options={{ headerShown: false }} />
 					<Stack.Screen name="+not-found" />
 				</Stack>
 			</Provider>

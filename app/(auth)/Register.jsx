@@ -13,9 +13,6 @@ import ModalPopup from "../../components/Modal";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function Register() {
-	// const [text, onChangeText] = React.useState(null);
-	// const [email, onChangeEmail] = React.useState(null);
-	// const [number, onChangeNumber] = React.useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [formData, setFormData] = useState({
