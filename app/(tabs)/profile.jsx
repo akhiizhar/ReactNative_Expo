@@ -12,29 +12,29 @@ export default function Profile() {
 
 	const [user, setUser] = useState("");
 
-	useEffect(() => {
-		const getEmail = async () => {
-			try {
-				const userData = await SecureStore.getItemAsync("user");
-				if (userData) {
-					const parsedEmail = JSON.parse(userData);
-					console.log("User data:", parsedEmail);
-					setUser(parsedEmail);
-				}
-			} catch (error) {
-				console.error("Failed to fetch email from SecureStore:", error);
-			}
-		};
+	// useEffect(() => {
+	// 	const getEmail = async () => {
+	// 		try {
+	// 			const userData = await SecureStore.getItemAsync("user");
+	// 			if (userData) {
+	// 				const parsedEmail = JSON.parse(userData);
+	// 				console.log("User data:", parsedEmail);
+	// 				setUser(parsedEmail);
+	// 			}
+	// 		} catch (error) {
+	// 			console.error("Failed to fetch email from SecureStore:", error);
+	// 		}
+	// 	};
 
-		getEmail();
-	}, []);
+	// 	getEmail();
+	// }, []);
 	return (
 		<View style={styles.container}>
 			<Text style={styles.akun}>Akun</Text>
 			<View style={styles.content}>
 				{data.email ? (
 					<>
-						<Text>{user.email}</Text>
+						<Text>{data.email}</Text>
 						<View>
 							{isLogin ? (
 								<Button

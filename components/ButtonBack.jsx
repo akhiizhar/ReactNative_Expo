@@ -3,7 +3,7 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-export default function ButtonBack() {
+export default function ButtonBack({ onPress }) {
 	const navigation = useNavigation();
 	const handleBackPress = () => {
 		navigation.goBack();
@@ -11,7 +11,7 @@ export default function ButtonBack() {
 
 	return (
 		<View style={styles.backButton}>
-			<TouchableOpacity onPress={handleBackPress}>
+			<TouchableOpacity onPress={onPress || handleBackPress}>
 				<Ionicons name="arrow-back-outline" size={24} color="black" />
 			</TouchableOpacity>
 		</View>
