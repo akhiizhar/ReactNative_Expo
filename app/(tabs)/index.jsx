@@ -9,6 +9,8 @@ import { router } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
 import { getCar, selectCar } from "@/redux/reducers/car/carSlice";
 import * as SecureStore from "expo-secure-store";
+import GeoLocation from "@/components/GeoLocation";
+import { normalize } from "../../utils/normalized";
 
 export default function HomeScreen() {
 	const [user, setUser] = useState("");
@@ -52,7 +54,7 @@ export default function HomeScreen() {
 				<View style={styles.container}>
 					<View>
 						<Text style={styles.titleText}>Hi, {user.email}</Text>
-						<Text style={styles.titleText}>Location</Text>
+						<GeoLocation />
 					</View>
 					<View>
 						<Image

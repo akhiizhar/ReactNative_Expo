@@ -3,51 +3,35 @@ import {
 	Text,
 	StyleSheet,
 	Button,
-	ScrollView,
-	TextInput,
 	TouchableOpacity,
 	Modal,
 } from "react-native";
 import React, { useState } from "react";
 import { ProgressSteps, ProgressStep } from "react-native-progress-stepper";
-import { router } from "expo-router";
 import { useSelector } from "react-redux";
 import { selectCarDetail } from "@/redux/reducers/car/carDetailsSlice";
 import ButtonBack from "@/components/ButtonBack";
-import CarList from "@/components/CarList";
-import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import Step1 from "./steps/Step1";
+import Step2 from "./steps/Step2";
+import Step3 from "./steps/Step3";
+import CountDown from "react-native-countdown-component-maintained";
+import Upload from "@/components/Upload";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
 	style: "currency",
 	currency: "IDR",
 });
 
-const selectBank = [
-	{ key: 1, bank: "BCA", purpose: "BCA Transfer" },
-	{ key: 2, bank: "BNI", purpose: "BNI Transfer" },
-	{ key: 3, bank: "Mandiri", purpose: "Mandiri Transfer" },
-];
-
 export default function index() {
 	const { data } = useSelector(selectCarDetail);
-	const [promoCode, setPromoCode] = useState("");
 	const [selectedBank, setSelectedBank] = useState(null); // Menyimpan bank yang dipilih
 	const [currentStep, setCurrentStep] = useState(0);
 	const navigation = useNavigation();
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	const handlePromoCodeChange = (text) => {
-		setPromoCode(text);
-	};
-
-	const handleBankSelect = (bank) => {
-		setSelectedBank(bank); // Mengatur bank yang dipilih
-	};
-
 	const handlePaymentProceed = () => {
 		console.log(selectedBank);
-
 		if (selectedBank) {
 			setCurrentStep(1); // Beralih ke langkah kedua
 		}
@@ -80,162 +64,47 @@ export default function index() {
 			</View>
 			<View style={{ flex: 1, marginBottom: 100 }}>
 				<ProgressSteps activeStep={currentStep}>
-					<ProgressStep
-						label="Pilih Metode"
-						removeBtnRow={true}
-						setCurrentStep={setCurrentStep}>
-						<View style={styles.container}>
-							<View>
-								<CarList
-									image={{ uri: data.image }}
-									carName={data.name}
-									passenger={5}
-									baggage={4}
-									price={data.price}
-								/>
-							</View>
-							<View style={styles.textPayment}>
-								<Text style={styles.capacityText}>Pilih Bank Transfer</Text>
-								<Text style={styles.capacityText}>
-									Kamu bisa membayar dengan transfer melalui ATM, Internet
-									Banking atau Mobile Banking
-								</Text>
-							</View>
-							<View style={styles.containerBank}>
-								<View style={styles.bankContainer}>
-									{selectBank.map((bank) => (
-										<TouchableOpacity
-											// onTouchEnd={() => handleBankSelect(bank)}
-											onPress={() => handleBankSelect(bank)}
-											activeOpacity={1}>
-											<View style={styles.bankList} key={bank.key}>
-												<View style={styles.bank}>
-													<Text style={styles.bankText}>{bank.bank}</Text>
-												</View>
-												<View style={styles.bankTextContainer}>
-													<Text style={styles.bankPurpose}>{bank.purpose}</Text>
-													{selectedBank === bank && (
-														<Ionicons
-															name="checkmark-sharp"
-															size={30}
-															color="green"
-														/>
-													)}
-												</View>
-											</View>
-										</TouchableOpacity>
-									))}
-								</View>
-							</View>
-							<View style={styles.containerPromo}>
-								<View style={styles.promoContainer}>
-									<Text style={styles.promoTitle}>% Pakai Kode Promo</Text>
-									<View style={styles.promoInputContainer}>
-										<TextInput
-											style={styles.promoInput}
-											placeholder="Tulis catatanmu di sini"
-											value={promoCode}
-											onChangeText={handlePromoCodeChange}
-										/>
-										<TouchableOpacity
-											style={[
-												styles.applyButton,
-												!promoCode && styles.disabledButton,
-											]}
-											disabled={!promoCode}>
-											<Text style={styles.applyButtonText}>Terapkan</Text>
-										</TouchableOpacity>
-									</View>
-								</View>
-							</View>
-						</View>
+					<ProgressStep label="Pilih Metode" removeBtnRow={true}>
+						<Step1
+							setCurrentStep={setCurrentStep}
+							setSelectedBank={setSelectedBank}
+							selectedBank={selectedBank}
+						/>
 					</ProgressStep>
 					<ProgressStep
 						label="Pembayaran"
 						removeBtnRow={true}
 						setCurrentStep={setCurrentStep}>
-						<View style={{ flex: 1, paddingBottom: 100 }}>
-							<View style={styles.textPayment}>
-								<Text style={styles.capacityText}>
-									Selesaikan Pembayaran Sebelum..
-								</Text>
-								<Text style={styles.capacityText}>
-									Rabu, 19 Jun 2022 jam 13.00 WIB
-								</Text>
-							</View>
-							<View>
-								<CarList
-									image={{ uri: data.image }}
-									carName={data.name}
-									passenger={5}
-									baggage={4}
-									price={data.price}
-								/>
-								<View style={styles.textPayment}>
-									<Text style={styles.capacityText}>Lakukan Transfer ke</Text>
-									<View style={styles.bankListStep}>
-										<View style={styles.bank}>
-											<Text style={styles.bankText}>{selectedBank?.bank}</Text>
-										</View>
-										<View style={styles.bankTextContainerCol}>
-											<Text style={styles.bankPurpose}>
-												{selectedBank?.purpose}
-											</Text>
-											<Text>a.n Izhar Ramadhan</Text>
-										</View>
-									</View>
-								</View>
-								<View>
-									<View style={styles.formContainer}>
-										<Text style={styles.text}>Nomor Rekening</Text>
-										<View style={styles.inputContainer}>
-											<TextInput
-												style={styles.input}
-												onChangeNumber={(value) => {
-													console.log(value);
-												}}
-												secureTextEntry={true}
-												placeholder="Masukkan Nomer Rekening"
-												keyboardType="numeric"
-											/>
-											<Ionicons
-												size={20}
-												name={"copy-outline"}
-												style={styles.iconContainer}
-											/>
-										</View>
-									</View>
-									<View style={styles.formContainer}>
-										<Text style={styles.text}>Total Bayar</Text>
-										<View style={styles.inputContainer}>
-											<TextInput
-												style={styles.input}
-												defaultValue={formatCurrency.format(data.price)}
-												editable={false}
-											/>
-											<Ionicons
-												size={20}
-												name={"copy-outline"}
-												style={styles.iconContainer}
-											/>
-										</View>
-									</View>
-								</View>
-							</View>
-						</View>
-						<Modal
+						<Step2
+							setCurrentStep={setCurrentStep}
+							selectedBank={selectedBank}
+						/>
+						<Upload
+							setCurrentStep={setCurrentStep}
+							isModalVisible={isModalVisible}
+							setIsModalVisible={setIsModalVisible}
+						/>
+						{/* <Modal
 							visible={isModalVisible}
 							style={{ marginHorizontal: 20, marginVertical: 20 }}>
-							<View style={styles.textPayment}>
-								<Text style={styles.capacityText}>Konfirmasi Pembayaran</Text>
-								<Text style={styles.capacityText}>
+							<View style={styles.textPayment1}>
+								<Text style={styles.capacityText1}>Konfirmasi Pembayaran</Text>
+								<Text style={styles.capacityText1}>
 									Terima kasih telah melakukan konfirmasi pembayaran.
 									Pembayaranmu akan segera kami cek tunggu kurang lebih 10 menit
 									untuk mendapatkan konfirmasi.
 								</Text>
 							</View>
 							<View>
-								<Text>Countdown</Text>
+								<CountDown
+									until={60 * 10}
+									size={10}
+									onFinish={() => alert("Finished")}
+									digitStyle={{ backgroundColor: "#FA2C5A" }}
+									digitTxtStyle={{ color: "#fff" }}
+									timeToShow={["M", "S"]}
+									timeLabels={{ m: null, s: null }}
+								/>
 							</View>
 							<View style={styles.textPayment}>
 								<Text style={styles.capacityText}>Upload Bukti Pembayaran</Text>
@@ -271,39 +140,13 @@ export default function index() {
 									</Text>
 								</TouchableOpacity>
 							</View>
-						</Modal>
+						</Modal> */}
 					</ProgressStep>
 					<ProgressStep
 						label="Tiket"
 						removeBtnRow={true}
 						setCurrentStep={setCurrentStep}>
-						<View>
-							<View style={styles.formContainer}>
-								<Text style={styles.text}>Invoice</Text>
-								<View style={styles.inputContainer}>
-									<TextInput
-										style={styles.input}
-										onChangeNumber={(value) => {
-											console.log(value);
-										}}
-										secureTextEntry={true}
-										placeholder="INV/xx/xx-xxxx/"
-										keyboardType="numeric"
-									/>
-									<Ionicons
-										size={20}
-										name={"cloud-download-outline"}
-										style={styles.iconContainer}
-									/>
-								</View>
-							</View>
-						</View>
-						<View>
-							<View style={styles.formContainer}>
-								<Text style={styles.text}>E-Tiket</Text>
-								<View style={styles.inputContainer}></View>
-							</View>
-						</View>
+						<Step3 setCurrentStep={setCurrentStep} />
 					</ProgressStep>
 				</ProgressSteps>
 			</View>
@@ -389,140 +232,18 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		marginHorizontal: 20,
 	},
-	container: {
-		marginHorizontal: 5,
-	},
-	footer: {
-		backgroundColor: "#eeeeee",
-		position: "absolute",
-		width: "100%",
-
-		bottom: 0,
-
-		padding: 20,
-	},
-	price: {
-		fontFamily: "PoppinsBold",
-		fontSize: 16,
-		marginBottom: 20,
-	},
-	containerPromo: {
-		marginVertical: 30,
-		marginHorizontal: 20,
-	},
-	promoContainer: {
-		marginTop: 20,
-		padding: 15,
-		backgroundColor: "#ffffff",
-		borderRadius: 10,
-		borderWidth: 1, // Menambahkan border
-		borderColor: "#E0E0E0",
-	},
-	promoTitle: {
+	capacityText1: {
+		color: "#000",
 		fontSize: 16,
 		fontFamily: "PoppinsBold",
-		marginBottom: 10,
-	},
-	promoInputContainer: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	promoInput: {
-		flex: 1,
-		padding: 10,
-		borderWidth: 1,
-		borderColor: "#E0E0E0",
-		borderRadius: 5,
-		fontFamily: "PoppinsRegular",
-	},
-	applyButton: {
-		backgroundColor: "#3D7B3F",
-		padding: 10,
-		borderRadius: 5,
-	},
-	applyButtonText: {
-		color: "#fff",
-		fontFamily: "PoppinsBold",
-	},
-	containerBank: {
-		marginHorizontal: 10,
-	},
-	bankContainer: {
-		marginTop: 20,
-		padding: 15,
-		gap: 10,
-	},
-	bankList: {
-		flexDirection: "row",
-		alignItems: "center",
-		borderBottomWidth: 1,
-		borderBottomColor: "#E0E0E0",
-		paddingVertical: 20,
-	},
-	bankListStep: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingVertical: 20,
-	},
-	bank: {
-		padding: 10,
-		borderWidth: 1,
-		borderColor: "#E0E0E0",
-		borderRadius: 5,
-		fontFamily: "PoppinsRegular",
-		marginRight: 20,
-		width: "25%",
-	},
-	bankText: {
-		fontFamily: "PoppinsRegular",
+		padding: 5,
 		textAlign: "center",
 	},
-	bankTextContainer: {
-		flex: 1,
-		flexDirection: "row",
-		justifyContent: "space-between",
+	textPayment1: {
+		marginTop: 20,
+		marginHorizontal: 20,
 		alignItems: "center",
-	},
-	bankTextContainerCol: {
-		flex: 1,
-
-		justifyContent: "space-between",
-	},
-	bankPurpose: {
-		fontFamily: "PoppinsRegular",
-		fontSize: 14,
-	},
-	disabledButton: {
-		backgroundColor: "#DEF1DF",
-	},
-	text: {
-		fontFamily: "PoppinsRegular",
-		fontSize: 14,
-		marginBottom: 5,
-		color: "#8A8A8A",
-	},
-	formContainer: {
-		paddingHorizontal: 20,
-		marginBottom: 30,
-	},
-	input: {
-		flex: 1,
-		padding: 10,
-		paddingHorizontal: 10,
-		color: "#000",
-		fontFamily: "PoppinsRegular",
-	},
-	inputContainer: {
-		flexDirection: "row",
-		alignItems: "center",
-		borderWidth: 1,
-		borderColor: "#000",
-		borderRadius: 5,
-		paddingHorizontal: 10,
-	},
-	iconContainer: {
-		padding: 5,
-		marginLeft: 10,
+		justifyContent: "center",
 	},
 	paymentButton: {
 		backgroundColor: "#3D7B3F",
@@ -537,5 +258,17 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		borderColor: "#3D7B3F",
 		borderWidth: 1,
+	},
+	footer: {
+		backgroundColor: "#eeeeee",
+		position: "absolute",
+		width: "100%",
+		bottom: 0,
+		padding: 20,
+	},
+	price: {
+		fontFamily: "PoppinsBold",
+		fontSize: 16,
+		marginBottom: 20,
 	},
 });

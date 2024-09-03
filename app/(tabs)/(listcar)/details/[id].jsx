@@ -18,6 +18,7 @@ import {
 	selectCarDetail,
 } from "@/redux/reducers/car/carDetailsSlice";
 import ButtonBack from "../../../../components/ButtonBack";
+import Constant from "expo-constants";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
 	style: "currency",
@@ -120,7 +121,9 @@ export default function detailScreen() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		marginTop: 50,
+		backgroundColor: "#fff",
+		paddingTop: Constant.statusBarHeight,
+		marginVertical: 20,
 	},
 	capacityText: {
 		color: "#8A8A8A",
@@ -149,18 +152,14 @@ const styles = StyleSheet.create({
 		margin: 15,
 		paddingTop: 20,
 		paddingHorizontal: 20,
-		backgroundColor: "#fff",
+		// backgroundColor: "#fff",
+		borderWidth: 1,
+		borderColor: "#E0E0E0",
 		borderRadius: 10,
 		shadowColor: "#000",
 		shadowRadius: 3,
 		shadowOpacity: 0.1,
 		shadowOffset: { width: 0, height: 1 },
-		// margin: 50,
-		// padding: 2,
-		// backgroundColor: "#fff",
-		// borderRadius: 10,
-		// shadowColor: "#000",
-		// shadowRadius: 3,
 	},
 	text: {
 		fontFamily: "PoppinsBold",

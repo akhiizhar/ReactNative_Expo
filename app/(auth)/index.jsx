@@ -106,7 +106,6 @@ export default function Login() {
 					onChangeText={(text) => handleChange("password", text)}
 					secureTextEntry={true}
 					placeholder="6+ Karakter"
-					keyboardType="numeric"
 				/>
 			</View>
 
