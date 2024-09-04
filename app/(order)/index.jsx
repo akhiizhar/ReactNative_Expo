@@ -1,11 +1,4 @@
-import {
-	View,
-	Text,
-	StyleSheet,
-	Button,
-	TouchableOpacity,
-	Modal,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { ProgressSteps, ProgressStep } from "react-native-progress-stepper";
 import { useSelector } from "react-redux";
@@ -15,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import Step1 from "./steps/Step1";
 import Step2 from "./steps/Step2";
 import Step3 from "./steps/Step3";
-import CountDown from "react-native-countdown-component-maintained";
+
 import Upload from "@/components/Upload";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
@@ -62,7 +55,7 @@ export default function index() {
 						: "Pembayaran"}
 				</Text>
 			</View>
-			<View style={{ flex: 1, marginBottom: 100 }}>
+			<View style={{ flex: 1 }}>
 				<ProgressSteps activeStep={currentStep}>
 					<ProgressStep label="Pilih Metode" removeBtnRow={true}>
 						<Step1
@@ -156,12 +149,22 @@ export default function index() {
 						<Text style={styles.price}>
 							{formatCurrency.format(data.price)}
 						</Text>
-						<Button
-							color="#3D7B3F"
-							title="Bayar"
-							onPress={handlePaymentProceed}
+						<TouchableOpacity
+							style={[
+								styles.paymentButton,
+								!selectedBank && styles.disabledButton,
+							]}
 							disabled={!selectedBank}
-						/>
+							onPress={handlePaymentProceed}>
+							<Text
+								style={{
+									fontFamily: "PoppinsBold",
+									fontSize: 16,
+									color: "#fff",
+								}}>
+								Konfirmasi Pembayaran
+							</Text>
+						</TouchableOpacity>
 					</>
 				)}
 				{currentStep === 1 && (
@@ -261,14 +264,20 @@ const styles = StyleSheet.create({
 	},
 	footer: {
 		backgroundColor: "#eeeeee",
-		position: "absolute",
-		width: "100%",
+		position: "fixed",
+		// width: "100%",
 		bottom: 0,
-		padding: 20,
+		top: 0,
+		right: 0,
+		left: 0,
+		paddingHorizontal: 20,
 	},
 	price: {
 		fontFamily: "PoppinsBold",
 		fontSize: 16,
-		marginBottom: 20,
+		marginVertical: 20,
+	},
+	disabledButton: {
+		backgroundColor: "#DEF1DF",
 	},
 });

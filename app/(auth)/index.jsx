@@ -5,6 +5,7 @@ import {
 	StyleSheet,
 	TextInput,
 	TouchableOpacity,
+	ScrollView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Link, router } from "expo-router";
@@ -33,6 +34,16 @@ export default function Login() {
 		password: "",
 	});
 
+	const [showPassword, setShowPassword] = useState(false);
+
+	const handlePressIn = () => {
+		setShowPassword(true);
+	};
+
+	const handlePressOut = () => {
+		setShowPassword(false);
+	};
+
 	const handleChange = (name, text) => {
 		setFormData({
 			...formData,
@@ -42,35 +53,8 @@ export default function Login() {
 
 	const handleSubmit = async () => {
 		dispatch(postLogin(formData));
-
-		// try {
-		// 	if (!formData.email || !formData.password) {
-		// 		setLocalErrorMessage("Email dan Password harus diisi");
-		// 		setModalVisible(true);
-		// 		setTimeout(() => {
-		// 			setModalVisible(false);
-		// 			setLocalErrorMessage(null);
-		// 		}, 2500);
-		// 		return;
-		// 	}
-
-		// 	if (!req.ok) throw new Error(body.message);
-
-		// 	save("user", JSON.stringify(body));
-		// 	setModalVisible(true);
-		// 	setTimeout(() => {
-		// 		setModalVisible(false);
-		// 		router.navigate("../(tabs)");
-		// 	}, 2500);
-		// } catch (e) {
-		// 	setLocalErrorMessage(e.message);
-		// 	setModalVisible(true);
-		// 	setTimeout(() => {
-		// 		setModalVisible(false);
-		// 		setLocalErrorMessage(null);
-		// 	}, 2500);
-		// }
 	};
+
 	useEffect(() => {
 		if (isModalVisible) {
 			setTimeout(() => {
@@ -81,7 +65,7 @@ export default function Login() {
 	}, [isModalVisible]);
 
 	return (
-		<View>
+		<ScrollView>
 			<View>
 				<Image
 					source={require("@/assets/images/logoToyota.png")}
@@ -93,20 +77,28 @@ export default function Login() {
 			</View>
 			<View style={styles.formContainer}>
 				<Text style={styles.text}>Email</Text>
-				<TextInput
-					style={styles.input}
-					onChangeText={(text) => handleChange("email", text)}
-					placeholder="Contoh: johndee@gmail.com"
-				/>
+				<View style={styles.input}>
+					<TextInput
+						onChangeText={(text) => handleChange("email", text)}
+						placeholder="Ex: johndee@gmail.com"
+					/>
+					<Ionicons name={"mail-outline"} size={24} color="black" />
+				</View>
 			</View>
 			<View style={styles.formContainer}>
 				<Text style={styles.text}>Password</Text>
-				<TextInput
-					style={styles.input}
-					onChangeText={(text) => handleChange("password", text)}
-					secureTextEntry={true}
-					placeholder="6+ Karakter"
-				/>
+				<View style={styles.input}>
+					<TextInput
+						secureTextEntry={!showPassword}
+						onChangeText={(text) => handleChange("password", text)}
+						placeholder="Password"
+					/>
+					<TouchableOpacity
+						onPressIn={handlePressIn}
+						onPressOut={handlePressOut}>
+						<Ionicons name={"eye-outline"} size={24} color="black" />
+					</TouchableOpacity>
+				</View>
 			</View>
 
 			<View style={styles.formContainer}>
@@ -149,7 +141,7 @@ export default function Login() {
 					)}
 				</View>
 			</ModalPopup>
-		</View>
+		</ScrollView>
 	);
 }
 
@@ -160,6 +152,8 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		borderRadius: 5,
 		fontFamily: "PoppinsRegular",
+		flexDirection: "row",
+		justifyContent: "space-between",
 	},
 	text: {
 		color: "black",
@@ -173,6 +167,7 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		fontFamily: "PoppinsBold",
 	},
+
 	formContainer: {
 		paddingHorizontal: 30,
 		marginBottom: 30,

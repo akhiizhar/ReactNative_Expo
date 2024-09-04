@@ -5,6 +5,7 @@ import {
 	StyleSheet,
 	TextInput,
 	TouchableOpacity,
+	ScrollView,
 } from "react-native";
 import React from "react";
 import { Link, router } from "expo-router";
@@ -33,6 +34,11 @@ const SignupSchema = Yup.object().shape({
 export default function Register() {
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
+
+	const toggleShowPassword = () => {
+		setShowPassword(!showPassword);
+	};
 
 	const handleSubmit = async (values) => {
 		try {
@@ -73,7 +79,7 @@ export default function Register() {
 		}
 	};
 	return (
-		<View>
+		<ScrollView>
 			<View>
 				<Image
 					source={require("@/assets/images/logoToyota.png")}
@@ -110,25 +116,35 @@ export default function Register() {
 						</View>
 						<View style={styles.formContainer}>
 							<Text style={styles.text}>Email*</Text>
-							<TextInput
-								onBlur={handleBlur("email")}
-								onChangeText={handleChange("email")}
-								style={styles.input}
-								placeholder="Contoh: johndee@gmail.com"
-							/>
+							<View style={styles.input}>
+								<TextInput
+									onBlur={handleBlur("email")}
+									onChangeText={handleChange("email")}
+									placeholder="Ex: johndee@gmail.com"
+								/>
+								<Ionicons name={"mail-outline"} size={24} color="black" />
+							</View>
 							{errors.email && touched.email ? (
 								<Text style={{ color: "red" }}>{errors.email}</Text>
 							) : null}
 						</View>
 						<View style={styles.formContainer}>
 							<Text style={styles.text}>Password</Text>
-							<TextInput
-								onBlur={handleBlur("password")}
-								onChangeText={handleChange("password")}
-								style={styles.input}
-								secureTextEntry={true}
-								placeholder="6+ Karakter"
-							/>
+							<View style={styles.input}>
+								<TextInput
+									onBlur={handleBlur("password")}
+									onChangeText={handleChange("password")}
+									placeholder="Enter Password"
+									secureTextEntry={!showPassword}
+								/>
+								<TouchableOpacity onPress={toggleShowPassword}>
+									<Ionicons
+										name={showPassword ? "eye-off" : "eye"}
+										size={24}
+										color="black"
+									/>
+								</TouchableOpacity>
+							</View>
 							{errors.password && touched.password ? (
 								<Text style={{ color: "red" }}>{errors.password}</Text>
 							) : null}
@@ -184,20 +200,19 @@ export default function Register() {
 					)}
 				</View>
 			</ModalPopup>
-		</View>
+		</ScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
 	input: {
-		// height: 40,
-		// margin: 10,
-		// marginTop: 0,
 		borderWidth: 1,
 		padding: 10,
 		paddingHorizontal: 10,
 		borderRadius: 5,
 		fontFamily: "PoppinsRegular",
+		flexDirection: "row",
+		justifyContent: "space-between",
 	},
 	text: {
 		// marginLeft: 10,
