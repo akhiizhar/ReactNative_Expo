@@ -4,6 +4,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	TextInput,
+	KeyboardAvoidingView,
 } from "react-native";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
@@ -11,6 +12,7 @@ import { selectCarDetail } from "@/redux/reducers/car/carDetailsSlice";
 import CarList from "@/components/CarList";
 import { Ionicons } from "@expo/vector-icons";
 import Constant from "expo-constants";
+import { postOrder, putOrderSlip } from "@/redux/reducers/order/orderSlice";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
 	style: "currency",
@@ -50,73 +52,75 @@ export default function step1({
 	};
 
 	return (
-		<View style={styles.pageContainer}>
-			<View style={styles.container}>
-				<View>
-					<CarList
-						image={{ uri: data.image }}
-						carName={data.name}
-						passenger={5}
-						baggage={4}
-						price={data.price}
-					/>
-				</View>
-				<View style={styles.textPayment}>
-					<Text style={styles.capacityText}>Pilih Bank Transfer</Text>
-					<Text style={styles.capacityText}>
-						Kamu bisa membayar dengan transfer melalui ATM, Internet Banking
-						atau Mobile Banking
-					</Text>
-				</View>
-				<View style={styles.containerBank}>
-					<View style={styles.bankContainer}>
-						{selectBank.map((bank) => (
-							<TouchableOpacity
-								key={bank.key}
-								onPress={() => handleBankSelect(bank)}
-								activeOpacity={1}>
-								<View style={styles.bankList}>
-									<View style={styles.bank}>
-										<Text style={styles.bankText}>{bank.bank}</Text>
-									</View>
-									<View style={styles.bankTextContainer}>
-										<Text style={styles.bankPurpose}>{bank.purpose}</Text>
-										{selectedBank === bank && (
-											<Ionicons
-												name="checkmark-sharp"
-												size={30}
-												color="green"
-											/>
-										)}
-									</View>
-								</View>
-							</TouchableOpacity>
-						))}
+		<KeyboardAvoidingView>
+			<View style={styles.pageContainer}>
+				<View style={styles.container}>
+					<View>
+						<CarList
+							image={{ uri: data.image }}
+							carName={data.name}
+							passenger={5}
+							baggage={4}
+							price={data.price}
+						/>
 					</View>
-				</View>
-				<View style={styles.containerPromo}>
-					<View style={styles.promoContainer}>
-						<Text style={styles.promoTitle}>% Pakai Kode Promo</Text>
-						<View style={styles.promoInputContainer}>
-							<TextInput
-								style={styles.promoInput}
-								placeholder="Tulis catatanmu di sini"
-								value={promoCode}
-								onChangeText={handlePromoCodeChange}
-							/>
-							<TouchableOpacity
-								style={[
-									styles.applyButton,
-									!promoCode && styles.disabledButton,
-								]}
-								disabled={!promoCode}>
-								<Text style={styles.applyButtonText}>Terapkan</Text>
-							</TouchableOpacity>
+					<View style={styles.textPayment}>
+						<Text style={styles.capacityText}>Pilih Bank Transfer</Text>
+						<Text style={styles.capacityText}>
+							Kamu bisa membayar dengan transfer melalui ATM, Internet Banking
+							atau Mobile Banking
+						</Text>
+					</View>
+					<View style={styles.containerBank}>
+						<View style={styles.bankContainer}>
+							{selectBank.map((bank) => (
+								<TouchableOpacity
+									key={bank.key}
+									onPress={() => handleBankSelect(bank)}
+									activeOpacity={1}>
+									<View style={styles.bankList}>
+										<View style={styles.bank}>
+											<Text style={styles.bankText}>{bank.bank}</Text>
+										</View>
+										<View style={styles.bankTextContainer}>
+											<Text style={styles.bankPurpose}>{bank.purpose}</Text>
+											{selectedBank === bank && (
+												<Ionicons
+													name="checkmark-sharp"
+													size={30}
+													color="green"
+												/>
+											)}
+										</View>
+									</View>
+								</TouchableOpacity>
+							))}
+						</View>
+					</View>
+					<View style={styles.containerPromo}>
+						<View style={styles.promoContainer}>
+							<Text style={styles.promoTitle}>% Pakai Kode Promo</Text>
+							<View style={styles.promoInputContainer}>
+								<TextInput
+									style={styles.promoInput}
+									placeholder="Tulis catatanmu di sini"
+									value={promoCode}
+									onChangeText={handlePromoCodeChange}
+								/>
+								<TouchableOpacity
+									style={[
+										styles.applyButton,
+										!promoCode && styles.disabledButton,
+									]}
+									disabled={!promoCode}>
+									<Text style={styles.applyButtonText}>Terapkan</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
 					</View>
 				</View>
 			</View>
-		</View>
+		</KeyboardAvoidingView>
 	);
 }
 

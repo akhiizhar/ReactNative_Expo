@@ -17,14 +17,14 @@ import {
 	closeModal,
 	postLogin,
 	selectUser,
-} from "../../redux/reducers/auth/authLogin";
+} from "@/redux/reducers/auth/authLogin";
 
 async function save(key, value) {
 	await SecureStore.setItemAsync(key, value);
 }
 
 export default function Login() {
-	const { errorMessage, isModalVisible, isError, data } =
+	const { errorMessage, isModalVisible, isError, dataLogin } =
 		useSelector(selectUser);
 	const dispatch = useDispatch();
 

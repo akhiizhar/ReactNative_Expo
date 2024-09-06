@@ -1,15 +1,20 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { ProgressSteps, ProgressStep } from "react-native-progress-stepper";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { selectCarDetail } from "@/redux/reducers/car/carDetailsSlice";
 import ButtonBack from "@/components/ButtonBack";
 import { useNavigation } from "@react-navigation/native";
 import Step1 from "./steps/Step1";
 import Step2 from "./steps/Step2";
 import Step3 from "./steps/Step3";
-
 import Upload from "@/components/Upload";
+import {
+	selectOrder,
+	postOrder,
+	putOrderSlip,
+} from "@/redux/reducers/order/orderSlice";
+import { selectUser } from "@/redux/reducers/auth/authLogin";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
 	style: "currency",
@@ -17,17 +22,33 @@ const formatCurrency = new Intl.NumberFormat("id-ID", {
 });
 
 export default function index() {
-	const { data } = useSelector(selectCarDetail);
+	const { data } = useSelector(selectCarDetail); // ambil id
 	const [selectedBank, setSelectedBank] = useState(null); // Menyimpan bank yang dipilih
 	const [currentStep, setCurrentStep] = useState(0);
 	const navigation = useNavigation();
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	const handlePaymentProceed = () => {
-		console.log(selectedBank);
+	const { dataLogin } = useSelector(selectUser); // ambil token
+	const { dataOrder } = useSelector(selectOrder);
+	const dispatch = useDispatch();
+
+	const handlePaymentProceed = async () => {
 		if (selectedBank) {
 			setCurrentStep(1); // Beralih ke langkah kedua
 		}
+		await dispatch(
+			postOrder({
+				formData: {
+					startRentAt: "2023-01-01",
+					finishRentAt: "2023-01-02",
+					carId: data.id,
+				},
+				token: dataLogin.access_token,
+			})
+		);
+		// console.log("dataLogin", dataLogin);
+		// console.log("data", data);
+		console.log("dataOrder", dataOrder);
 	};
 
 	const handleUpload = () => {
@@ -77,63 +98,6 @@ export default function index() {
 							isModalVisible={isModalVisible}
 							setIsModalVisible={setIsModalVisible}
 						/>
-						{/* <Modal
-							visible={isModalVisible}
-							style={{ marginHorizontal: 20, marginVertical: 20 }}>
-							<View style={styles.textPayment1}>
-								<Text style={styles.capacityText1}>Konfirmasi Pembayaran</Text>
-								<Text style={styles.capacityText1}>
-									Terima kasih telah melakukan konfirmasi pembayaran.
-									Pembayaranmu akan segera kami cek tunggu kurang lebih 10 menit
-									untuk mendapatkan konfirmasi.
-								</Text>
-							</View>
-							<View>
-								<CountDown
-									until={60 * 10}
-									size={10}
-									onFinish={() => alert("Finished")}
-									digitStyle={{ backgroundColor: "#FA2C5A" }}
-									digitTxtStyle={{ color: "#fff" }}
-									timeToShow={["M", "S"]}
-									timeLabels={{ m: null, s: null }}
-								/>
-							</View>
-							<View style={styles.textPayment}>
-								<Text style={styles.capacityText}>Upload Bukti Pembayaran</Text>
-								<Text style={styles.capacityText}>
-									Untuk membantu kami lebih cepat melakukan pengecekan. Kamu
-									bisa upload bukti bayarmu
-								</Text>
-							</View>
-							<View>
-								<Text>PDF</Text>
-							</View>
-							<View style={{ gap: 10, marginHorizontal: 20 }}>
-								<TouchableOpacity
-									style={styles.paymentButton}
-									onPress={handleUpload}>
-									<Text
-										style={{
-											fontFamily: "PoppinsBold",
-											fontSize: 16,
-											color: "#fff",
-										}}>
-										Upload
-									</Text>
-								</TouchableOpacity>
-								<TouchableOpacity style={styles.paymentButton1}>
-									<Text
-										style={{
-											fontFamily: "PoppinsBold",
-											fontsSize: 16,
-											color: "#3D7B3F",
-										}}>
-										Lihat Daftar Pesanan
-									</Text>
-								</TouchableOpacity>
-							</View>
-						</Modal> */}
 					</ProgressStep>
 					<ProgressStep
 						label="Tiket"
@@ -253,6 +217,7 @@ const styles = StyleSheet.create({
 		padding: 10,
 		borderRadius: 5,
 		alignItems: "center",
+		paddingHorizontal: 50,
 	},
 	paymentButton1: {
 		backgroundColor: "#fff",
@@ -263,19 +228,16 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 	},
 	footer: {
-		backgroundColor: "#eeeeee",
+		backgroundColor: "#fff",
 		position: "fixed",
-		// width: "100%",
+		width: "100%",
 		bottom: 0,
-		top: 0,
-		right: 0,
-		left: 0,
-		paddingHorizontal: 20,
+		padding: 20,
 	},
 	price: {
 		fontFamily: "PoppinsBold",
 		fontSize: 16,
-		marginVertical: 20,
+		marginBottom: 20,
 	},
 	disabledButton: {
 		backgroundColor: "#DEF1DF",

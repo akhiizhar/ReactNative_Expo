@@ -9,7 +9,7 @@ const authLogin = createSlice({
 	name: "user",
 	initialState: {
 		isLoading: false,
-		data: getStore() ? getStore() : {},
+		dataLogin: getStore() ? getStore() : {},
 		isModalVisible: false,
 		isLogin: getStore() ? true : false,
 		isError: false,
@@ -22,7 +22,7 @@ const authLogin = createSlice({
 			state.errorMessage = null;
 		},
 		logout: (state) => {
-			state.data = {};
+			state.dataLogin = {};
 			state.isLogin = false;
 			SecureStore.deleteItemAsync("user");
 		},
@@ -34,7 +34,7 @@ const authLogin = createSlice({
 		builder.addCase(postLogin.fulfilled, (state, action) => {
 			state.isLoading = false;
 			state.isLogin = true;
-			state.data = action.payload;
+			state.dataLogin = action.payload;
 			console.log(action.payload);
 			setStore(action.payload);
 			state.isModalVisible = true;

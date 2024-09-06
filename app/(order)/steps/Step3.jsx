@@ -29,7 +29,13 @@ export default function step3() {
 			<View>
 				<View style={styles.formContainer}>
 					<Text style={styles.text}>E-Tiket</Text>
-					<View style={styles.inputContainer}></View>
+					<View style={styles.pdf}>
+						<Ionicons name="images" size={24} color="black" />
+						<Text style={styles.text}>PDF Viewer</Text>
+					</View>
+					<Text style={{ ...styles.text, color: "#3C3C3C" }}>
+						Tunjukkan tiket ini ke petugas JBO di pos penjemputan Anda.
+					</Text>
 				</View>
 			</View>
 		</View>
@@ -65,5 +71,23 @@ const styles = StyleSheet.create({
 	iconContainer: {
 		padding: 5,
 		marginLeft: 10,
+	},
+	pdf: {
+		borderWidth: 1,
+		borderColor: "#D0D0D0",
+		paddingHorizontal: 50,
+		paddingVertical: 50,
+		marginHorizontal: 10,
+		borderRadius: 5,
+		alignItems: "center",
+		justifyContent: "center",
+		borderStyle: "dashed",
+		backgroundColor: "#F5F5F5",
+		flexDirection: "row",
+	},
+	text: {
+		padding: 10,
+		fontFamily: "PoppinsRegular",
+		color: "#3C3C3C",
 	},
 });

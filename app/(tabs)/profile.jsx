@@ -7,7 +7,7 @@ import { selectUser, logout } from "@/redux/reducers/auth/authLogin";
 import { router } from "expo-router";
 
 export default function Profile() {
-	const { data, isLogin } = useSelector(selectUser);
+	const { dataLogin, isLogin } = useSelector(selectUser);
 	const dispatch = useDispatch();
 
 	const [user, setUser] = useState("");
@@ -18,7 +18,7 @@ export default function Profile() {
 	// 			const userData = await SecureStore.getItemAsync("user");
 	// 			if (userData) {
 	// 				const parsedEmail = JSON.parse(userData);
-	// 				console.log("User data:", parsedEmail);
+	// 				console.log("User dataLogin:", parsedEmail);
 	// 				setUser(parsedEmail);
 	// 			}
 	// 		} catch (error) {
@@ -32,9 +32,9 @@ export default function Profile() {
 		<View style={styles.container}>
 			<Text style={styles.akun}>Akun</Text>
 			<View style={styles.content}>
-				{data.email ? (
+				{dataLogin.email ? (
 					<>
-						<Text>{data.email}</Text>
+						<Text>{dataLogin.email}</Text>
 						<View>
 							{isLogin ? (
 								<Button
