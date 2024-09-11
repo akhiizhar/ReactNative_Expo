@@ -4,11 +4,13 @@ import { postOrder, putOrderSlip } from "./orderApi";
 const initialState = {
 	isLoading: false,
 	carId: null,
-	dataOrder: [],
+	dataOrder: {},
 	errorMessage: null,
 	currentStepOrder: null,
 	selectedBank: null,
 	promo: null,
+	isModalVisible: false,
+	status: "pending",
 };
 
 const orderSlice = createSlice({
@@ -22,8 +24,9 @@ const orderSlice = createSlice({
 			const { name, value } = payload;
 			state[name] = value;
 		},
-		resetState: (state) => {
-			state = initialState;
+		resetState: () => {
+			console.log("reset state", initialState);
+			return initialState;
 		},
 	},
 
@@ -34,15 +37,12 @@ const orderSlice = createSlice({
 		builder.addCase(postOrder.fulfilled, (state, action) => {
 			state.isLoading = false;
 			state.dataOrder = action.payload;
-			// console.log(action.payload);
-			// setStore(action.payload);
-			// state.isModalVisible = true;
+			state.status = "success";
 		});
 		builder.addCase(postOrder.rejected, (state, action) => {
 			state.isLoading = false;
 			state.errorMessage = action.payload;
-			// state.isError = true;
-			// state.isModalVisible = true;
+			state.status = "error";
 		});
 
 		builder.addCase(putOrderSlip.pending, (state, action) => {
@@ -51,15 +51,11 @@ const orderSlice = createSlice({
 		builder.addCase(putOrderSlip.fulfilled, (state, action) => {
 			state.isLoading = false;
 			state.dataOrder = action.payload;
-			// console.log(action.payload);
-			// setStore(action.payload);
-			// state.isModalVisible = true;
+			state.status = "upload-success";
 		});
 		builder.addCase(putOrderSlip.rejected, (state, action) => {
 			state.isLoading = false;
 			state.errorMessage = action.payload;
-			// state.isError = true;
-			// state.isModalVisible = true;
 		});
 	},
 });

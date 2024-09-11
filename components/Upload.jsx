@@ -6,27 +6,58 @@ import {
 	StyleSheet,
 	Pressable,
 	Image,
+	Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CountDown from "react-native-countdown-component-maintained";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { putOrderSlip, selectOrder } from "@/redux/reducers/order/orderSlice";
+import { selectUser } from "@/redux/reducers/auth/authLogin";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function Upload({
 	isModalVisible,
 	setCurrentStep,
 	setIsModalVisible,
 }) {
+	// const width = Dimensions.get("window").width;
+	const [image, setImage] = useState(null);
+	const dispatch = useDispatch();
+	const { dataOrder, status, errorMessage } = useSelector(selectOrder);
+	const user = useSelector(selectUser);
+
+	// formData hanya digunakan hanya untuk upload file
 	const handleUpload = () => {
-		setCurrentStep(2);
-		setIsModalVisible(false);
+		if (image) {
+			console.log(image);
+			const formData = new FormData(); // berfungsi mengirim multipart(beda2 jenis file) formData,
+			formData.append("slip", image); // APPEND BERFUNGSI UNTU MENAMBAHKAN DATA KE FORMDATA, "SLIP" itu name, imgae itu datanya, "slip" itu harus sama namanya dengan di backend
+			dispatch(
+				putOrderSlip({
+					token: user.dataLogin.access_token,
+					id: dataOrder.id,
+					formData,
+				})
+			); //
+		}
 	};
+
+	useEffect(() => {
+		if (status === "upload-success") {
+			console.log("Upload succes", dataOrder);
+			setTimeout(() => {
+				setCurrentStep(2);
+				setIsModalVisible(false);
+			}, 3000);
+		} else {
+			console.log("error", errorMessage);
+		}
+	}, [status]);
 
 	const handleCloseModal = () => {
 		setIsModalVisible(false);
 	};
-
-	const [image, setImage] = useState(null);
 
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -39,7 +70,11 @@ export default function Upload({
 		console.log(result);
 
 		if (!result.canceled) {
-			setImage(result.assets[0].uri);
+			setImage({
+				uri: result.assets[0].uri,
+				name: result.assets[0].fileName,
+				type: result.assets[0].mimeType,
+			});
 		}
 	};
 
@@ -75,7 +110,7 @@ export default function Upload({
 				<View>
 					<Pressable style={styles.pdf} onPress={pickImage}>
 						{image ? (
-							<Image source={{ uri: image }} style={styles.image} />
+							<Image source={{ uri: image.uri }} style={styles.image} />
 						) : (
 							<View
 								style={{
@@ -122,11 +157,18 @@ export default function Upload({
 						</Text>
 					</TouchableOpacity>
 				</View>
-				<View>
+				<View style={{ alignItems: "center" }}>
 					<TouchableOpacity onPress={handleCloseModal}>
 						<View style={styles.closeButton}>
-							<Ionicons name="close-circle-outline" size={24} color="black" />
-							<Text>Close</Text>
+							<Ionicons name="close-circle-outline" size={50} color="red" />
+							<Text
+								style={{
+									fontFamily: "PoppinsBold",
+									fontSize: 16,
+									justifyContent: "center",
+								}}>
+								Close
+							</Text>
 						</View>
 					</TouchableOpacity>
 				</View>
@@ -136,8 +178,13 @@ export default function Upload({
 }
 
 const styles = StyleSheet.create({
+	modalContainer: {
+		backgroundColor: "rgba(0,0,0, 0.5)",
+		paddingVertical: 50,
+		// flex: 1,
+	},
 	container: {
-		flex: 1,
+		// paddingVertical: 50,
 		justifyContent: "center",
 	},
 	textPayment1: {
@@ -194,9 +241,10 @@ const styles = StyleSheet.create({
 		height: 200,
 		width: "auto",
 		objectFit: "contain",
+		// width: windowsWidth * 0.9,
 	},
 	closeButton: {
 		justifyContent: "center",
-		alignContent: "center",
+		// alignContent: "center",
 	},
 });

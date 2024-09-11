@@ -18,12 +18,51 @@ import {
 	postLogin,
 	selectUser,
 } from "@/redux/reducers/auth/authLogin";
+import auth from "@react-native-firebase/auth";
+import {
+	GoogleSignin,
+	GoogleSigninButton,
+} from "@react-native-google-signin/google-signin";
+
+// Install Google Sign-in by oauth untuk configure
+GoogleSignin.configure({
+	webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+});
 
 async function save(key, value) {
 	await SecureStore.setItemAsync(key, value);
 }
 
 export default function Login() {
+	async function onGoogleButtonPress() {
+		try {
+			await GoogleSignin.hasPlayServices({
+				showPlayServicesUpdateDialog: true,
+			});
+
+			const {
+				data: { idToken },
+			} = await GoogleSignin.signIn();
+
+			const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+			console.log(idToken, googleCredential);
+
+			return auth().signInWithCredential(googleCredential);
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	function onAuthStateChanged(user) {
+		console.log(user);
+		// if (initializing) setInitializing(false);
+	}
+
+	useEffect(() => {
+		const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+		return subscriber; // unsubscribe on unmount
+	}, []);
+
 	const { errorMessage, isModalVisible, isError, dataLogin } =
 		useSelector(selectUser);
 	const dispatch = useDispatch();
@@ -116,6 +155,15 @@ export default function Login() {
 				</Text>
 			</View>
 
+			<View style={styles.formContainer1}>
+				<Text style={styles.text1}>Sign In with:</Text>
+				<GoogleSigninButton
+					size={GoogleSigninButton.Size.Standard}
+					color={GoogleSigninButton.Color.Light}
+					onPress={onGoogleButtonPress}
+				/>
+			</View>
+
 			<ModalPopup visible={isModalVisible}>
 				<View style={styles.modalBackground}>
 					{localErrorMessage || errorMessage !== null ? (
@@ -160,6 +208,11 @@ const styles = StyleSheet.create({
 		fontFamily: "PoppinsBold",
 		fontSize: 14,
 	},
+	text1: {
+		color: "black",
+		fontFamily: "PoppinsBold",
+		fontSize: 16,
+	},
 	heading: {
 		fontSize: 40,
 		marginVertical: 30,
@@ -171,6 +224,10 @@ const styles = StyleSheet.create({
 	formContainer: {
 		paddingHorizontal: 30,
 		marginBottom: 30,
+	},
+	formContainer1: {
+		paddingTop: 10,
+		alignItems: "center",
 	},
 	textRegister: {
 		marginTop: 10,

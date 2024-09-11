@@ -20,7 +20,7 @@ function getDate24() {
 
 export default function step2({ selectedBank }) {
 	const { data } = useSelector(selectCarDetail);
-	console.log(selectedBank);
+	// console.log(selectedBank);
 
 	const copyToClipboard = async (text) => {
 		await Clipboard.setStringAsync(text.toString());
@@ -72,11 +72,6 @@ export default function step2({ selectedBank }) {
 						<View style={styles.inputContainer}>
 							<TextInput
 								style={styles.input}
-								// onChangeNumber={(value) => {
-								// 	console.log(value);
-								// }}
-								// secureTextEntry={true}
-								// placeholder="Masukkan Nomer Rekening"
 								value={
 									selectedBank?.rekening || "Nomor rekening tidak tersedia"
 								}

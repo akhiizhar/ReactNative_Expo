@@ -47,7 +47,7 @@ export default function step1({
 	const handlePaymentProceed = () => {
 		if (selectedBank) {
 			setCurrentStep(1); // Beralih ke langkah kedua
-			console.log();
+			// console.log();
 		}
 	};
 

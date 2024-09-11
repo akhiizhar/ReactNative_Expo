@@ -50,6 +50,7 @@ export default function detailScreen() {
 		const signal = controller.signal; // UseEffect cleanup
 
 		dispatch(getCarDetail({ id, signal }));
+		console.log(data);
 
 		return () => {
 			controller.abort();

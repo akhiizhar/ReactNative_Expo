@@ -1,8 +1,28 @@
-import { View, Text, StyleSheet, TextInput } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, TextInput, Image } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { selectOrder } from "@/redux/reducers/order/orderSlice";
+import { useSelector } from "react-redux";
 
 export default function step3() {
+	const { dataOrder } = useSelector(selectOrder);
+	console.log(dataOrder.slip);
+
+	const [imageUri, setImageUri] = useState(null);
+
+	useEffect(() => {
+		// Pastikan ada URI gambar yang didapat
+		if (dataOrder.slip) {
+			// Gunakan setTimeout untuk menunda tampilan gambar
+			const timer = setTimeout(() => {
+				setImageUri(dataOrder.slip); // Atur URI gambar
+			}, 2000); // Menunggu 2 detik sebelum menampilkan gambar
+
+			// Cleanup timer jika component di-unmount
+			return () => clearTimeout(timer);
+		}
+	}, [dataOrder.slip]);
+
 	return (
 		<View>
 			<View>
@@ -30,8 +50,17 @@ export default function step3() {
 				<View style={styles.formContainer}>
 					<Text style={styles.text}>E-Tiket</Text>
 					<View style={styles.pdf}>
-						<Ionicons name="images" size={24} color="black" />
-						<Text style={styles.text}>PDF Viewer</Text>
+						{imageUri ? (
+							<Image
+								source={{ uri: dataOrder.slip }}
+								style={{ height: 200, width: 200, resizeMode: "contain" }}
+							/>
+						) : (
+							<>
+								<Ionicons name="images" size={24} color="black" />
+								<Text style={styles.text}>PDF Viewer</Text>
+							</>
+						)}
 					</View>
 					<Text style={{ ...styles.text, color: "#3C3C3C" }}>
 						Tunjukkan tiket ini ke petugas JBO di pos penjemputan Anda.
@@ -73,6 +102,7 @@ const styles = StyleSheet.create({
 		marginLeft: 10,
 	},
 	pdf: {
+		height: 200,
 		borderWidth: 1,
 		borderColor: "#D0D0D0",
 		paddingHorizontal: 50,

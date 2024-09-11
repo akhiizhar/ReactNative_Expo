@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ProgressSteps, ProgressStep } from "react-native-progress-stepper";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux"; //
 import { selectCarDetail } from "@/redux/reducers/car/carDetailsSlice";
 import ButtonBack from "@/components/ButtonBack";
 import { useNavigation } from "@react-navigation/native";
@@ -12,9 +12,11 @@ import Upload from "@/components/Upload";
 import {
 	selectOrder,
 	postOrder,
+	resetState,
 	putOrderSlip,
 } from "@/redux/reducers/order/orderSlice";
 import { selectUser } from "@/redux/reducers/auth/authLogin";
+import moment from "moment";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
 	style: "currency",
@@ -29,7 +31,7 @@ export default function index() {
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
 	const { dataLogin } = useSelector(selectUser); // ambil token
-	const { dataOrder } = useSelector(selectOrder);
+	const { dataOrder, status, errorMessage } = useSelector(selectOrder);
 	const dispatch = useDispatch();
 
 	const handlePaymentProceed = async () => {
@@ -39,8 +41,8 @@ export default function index() {
 		await dispatch(
 			postOrder({
 				formData: {
-					startRentAt: "2023-01-01",
-					finishRentAt: "2023-01-02",
+					startRentAt: moment().format("YYYY-MM-DD"),
+					finishRentAt: moment().add(2, "days").format("YYYY-MM-DD"),
 					carId: data.id,
 				},
 				token: dataLogin.access_token,
@@ -48,8 +50,16 @@ export default function index() {
 		);
 		// console.log("dataLogin", dataLogin);
 		// console.log("data", data);
-		console.log("dataOrder", dataOrder);
 	};
+
+	useEffect(() => {
+		if (status === "success" && selectedBank) {
+			console.log("dataOrder", dataOrder);
+			setCurrentStep(1);
+		} else {
+			console.log("error", errorMessage);
+		}
+	}, [status]);
 
 	const handleUpload = () => {
 		setCurrentStep(2);
@@ -59,6 +69,7 @@ export default function index() {
 	const handleBack = () => {
 		if (currentStep === 0) {
 			navigation.goBack();
+			dispatch(resetState());
 		} else {
 			setCurrentStep((prevStep) => prevStep - 1);
 		}

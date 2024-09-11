@@ -47,6 +47,8 @@ export const putOrderSlip = createAsyncThunk(
 				}
 			);
 			const body = await req?.json();
+			console.log(body);
+
 			if (!req.ok) throw new Error(body.message);
 			return body;
 		} catch (e) {
